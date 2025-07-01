@@ -1,7 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLazyGetCurrentUserQuery } from '../RTK Query/UserApi';
+import { useSelector } from 'react-redux';
+import { selectGetCurUserResult } from '../RTK Query/Selectors';
 
 const Home = () => {
+  const currUserData = useSelector((state) => selectGetCurUserResult(state)?.data );
+  const [getCurUser , {data}] = useLazyGetCurrentUserQuery();
+  useEffect(() =>{
+    if( !userData){
+       getCurUser(); 
+    } 
+  }, [] ); 
+  const userData = currUserData || data;
+
   const [todos, setTodos] = useState([]);
 
   const navigate = useNavigate();

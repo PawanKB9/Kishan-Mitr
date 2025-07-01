@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 
 const CropForm = () => {
+
+  const [cropName ,setCropName] = useState('');
+  const [seedingDate ,setSeedingDate] = useState('');
+  // const [soilCondition ,setSoilCondition] = useState('');
+  const [area ,setArea] = useState('');
+  const [soilCondition ,setSoilCondition] = useState('');
   const [formData, setFormData] = useState({
     cropName: '',
     seedingDate: '',
@@ -8,6 +14,9 @@ const CropForm = () => {
     soilCondition: '',
     unit: 'Acres/Hectares',
   });
+//  1 Bissa ≈ 125 m²
+//  1 Bigha  ≈ 2,500 m²
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,7 +40,7 @@ const CropForm = () => {
       {/* Crop Name */}
       <div>
         <label className="block mb-1 font-medium text-gray-700">Crop Name</label>
-        <input type="text" name="cropName" value={formData.cropName} onChange={handleChange}
+        <input type="text" name="cropName" value={cropName} onChange={handleChange}
           placeholder="Enter crop name"
           className="w-full sm:text-lg p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400"
           required />
@@ -40,7 +49,7 @@ const CropForm = () => {
       {/* Date of Seeding */}
       <div>
         <label className="block mb-1 font-medium text-gray-700">Date of Seeding</label>
-        <input type="date" name="seedingDate" value={formData.seedingDate}
+        <input type="date" name="seedingDate" value={seedingDate}
           onChange={handleChange} required
           className="w-full sm:text-lg p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400" />
       </div>
@@ -50,11 +59,11 @@ const CropForm = () => {
         <label className="block mb-1 font-medium text-gray-700">
           Area of Field
         </label>
-        <input type="text" name="area" value={formData.area} onChange={handleChange}
+        <input type="text" name="area" value={area} onChange={handleChange}
           placeholder="Enter area" required
           className="w-full sm:text-lg p-2 pr-32 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400" />
        
-        <select name="unit" value={formData.unit}  onChange={handleChange}
+        <select name="unit" value={unit}  onChange={handleChange}
           className="absolute right-0 sm:text-base  bg-white text-sm border border-gray-300 rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-green-400" >
           <option value="Bissa">Bissa</option>
           <option value="Bigha">Bigha</option>
@@ -68,7 +77,7 @@ const CropForm = () => {
         <label className="block mb-1 font-medium text-gray-700">
           Soil Condition <span className="text-sm text-gray-500">(optional)</span>
         </label>
-        <textarea name="soilCondition" value={formData.soilCondition} onChange={handleChange} rows={3}
+        <textarea name="soilCondition" value={soilCondition} onChange={handleChange} rows={3}
           placeholder="Describe soil condition, e.g. sandy with good drainage, slightly acidic"
           className="w-full sm:text-lg p-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-green-400" />
       </div>

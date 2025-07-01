@@ -1,24 +1,25 @@
-import React, { useRef, useState } from 'react';
-import {
-  Camera,
-  Heart,
-  ThumbsDown,
-  Settings,
-  Download,
-  Video,
-  VideoOff,
-  HelpCircle,
-  MessageCircle,
-} from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Camera, Heart, ThumbsDown, Settings, Download, Video, VideoOff, HelpCircle, MessageCircle,} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { selectGetCurUserResult } from '../RTK Query/Selectors';
+import { useLazyGetCurrentUserQuery } from '../RTK Query/UserApi';
 
 const UserProfilePage = () => {
-  const [user, setUser] = useState({
-    username: 'Pawan Kumar Bind',
-    profileImg: 'https://via.placeholder.com/150',
-    hasChannel: true,
-  });
-
+  // const [user, setUser] = useState({
+  //   username: 'Pawan Kumar Bind',
+  //   profileImg: 'https://via.placeholder.com/150',
+  //   hasChannel: true,
+  // });
+  const currUserData = useSelector((state) => selectGetCurUserResult(state)?.data );
+  const [getCurUser , {data}] = useLazyGetCurrentUserQuery();
+  useEffect(() =>{
+    if( !userData){
+       getCurUser(); 
+    } 
+  }, [] ); 
+  const userData = currUserData || data;
+console.log(userData);
   const inputRef = useRef(null);
 
   const handleImageChange = (e) => {
@@ -38,7 +39,9 @@ const UserProfilePage = () => {
       <div className="flex items-center gap-[10%] ml-2 sm:ml-8 mb-6">
         <div className="relative">
           <img
-            src={user.profileImg}
+            src={ userData?.profilePic ||
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(userData?.name || 'User')}&background=0D8ABC&color=fff&bold=true`
+              }
             alt="Profile"
             className="w-24 h-24 sm:w-28 sm:h-28 lg:w-36 lg:h-36 rounded-full object-cover border-2"
           />
@@ -57,8 +60,8 @@ const UserProfilePage = () => {
           </button>
         </div>
         <div>
-          <h1 className="text-2xl font-semibold text-gray-800">{user.username}</h1>
-          <p className="text-sm text-gray-500">Manage your account and content</p>
+          <h1 className="text-2xl font-semibold text-gray-800">{userData?.name}</h1>
+          <p className="text-sm text-gray-500">{userData?.phone}</p>
         </div>
       </div>
 
@@ -66,7 +69,7 @@ const UserProfilePage = () => {
       <div className="bg-white shadow rounded-lg divide-y divide-gray-200 overflow-hidden">
         <ActionRow icon={<Heart className="text-red-500" />} label="likes" />
         <ActionRow icon={<ThumbsDown className="text-blue-500" />} label="dislikes" />
-        {user.hasChannel ? (
+        {userData?.hasChannel ? (
           <ActionRow icon={<Video className="text-green-600" />} label="My_Channel" />
         ) : (
           <ActionRow icon={<VideoOff className="text-gray-400" />} label="Create_Channel" />

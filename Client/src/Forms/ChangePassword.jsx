@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid'; 
+import { useChangePasswordMutation } from '../RTK Query/UserApi';
+import {toast} from 'react-hot-toast';
 // import { toast } from 'react-hot-toast';
 // import { useChangePasswordMutation } from '../../RTKQuery/AppApi.jsx';
 
@@ -21,7 +23,7 @@ const ChangePasswordForm = () => {
     return newErrors;
   };
 
-  // const [changePassword] = useChangePasswordMutation();
+  const [changePassword ,{data}] = useChangePasswordMutation();
   const navigate = useNavigate(); 
 
   const handleSubmit = async (e) => {
@@ -31,14 +33,18 @@ const ChangePasswordForm = () => {
       setErrors(validationErrors);
       return;
     }
-    // try {
-    //   await changePassword({ oldPassword, newPassword }).unwrap();
-    //   toast.success('Password Updated Sucessfully!');
-    //   navigate('/'); 
+    try {
+      await changePassword({ oldPassword, newPassword }).unwrap();
+      toast.success('Password Updated Sucessfully!');
+      console.log(data);
+      setOldPassword('');
+      setNewPassword('');
+      setErrors({});
+      navigate('/'); 
 
-    // } catch (err) {
-    //   console.log(err);
-    // }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (

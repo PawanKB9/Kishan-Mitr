@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import { useNavigate } from "react-router-dom";
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid'; 
-// import { toast } from 'react-hot-toast';
-// import {  useForgotPasswordMutation } from '../../RTKQuery/AppApi.jsx';
+import { useForgotPasswordMutation } from '../RTK Query/UserApi';
+import OtpVerification from './VerifyOtp';
+import { toast } from 'react-hot-toast';
 
 
 const ForgotPasswordForm = () => {
@@ -12,35 +13,59 @@ const ForgotPasswordForm = () => {
   
 
   const [phone , setPhone] = useState('');
-  const [newPassword , setPassword] = useState('')
+  const [password , setPassword] = useState('')
+  const [verify , setVerify ] = useState(false);
+  const [token ,setToken] = useState('');
+
+  const [forgotPassword] = useForgotPasswordMutation();
   const navigate = useNavigate(); 
-  const strength = getPasswordStrength(newPassword);
+  const strength = getPasswordStrength(password);
   const validate = () => {
    const newErrors = {};
    if (!phone) newErrors.phone = 'Phone is required';
-   if (!newPassword) newErrors.newPassword = 'New password is required';
+   if (!password) newErrors.password = 'New password is required';
    return newErrors;
  };
 
-  // const [forgotPassword] = useForgotPasswordMutation();
+ useEffect(()=>{
+     if (!token?.length) return;
+ 
+     ;(async () => {
+       try {
+         await forgotPassword({ phone, password ,token }).unwrap();
+         toast.success('Password Reset Sucessfully!')
+         console.log('Password Updated:');
+         setPassword('');
+         setPhone('');
+         navigate('/');
+       } catch (err) {
+        setVerify(false);
+         console.error('Failed Updation:', err);
+         toast.error('Reset failed!');
+         if (err.data && err.data.errors) {
+           setErrors(err.data.errors);
+         } else {
+           setErrors({ general: 'An error occurred during sign up' });
+         }
+       }
+     })();
+   },[token])
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
-    if(!phone || !newPassword){
+    if(!phone || !password){
       setErrors(validationErrors);
       return;
     }
-    // try {
-      // await forgotPassword({ phone, newPassword }).unwrap();
-      // toast.success('Password Reset Sucessfully!')
-      // navigate('/'); 
-    // } catch (err) {
-      // console.log(err); 
-    // }
+    setPhone('91' + phone)
+    setVerify(true);
+
   }
 
   return (
-    <div className="flex justify-center min-h-screen pt-24 pb-42 bg-gray-100 px-4">
+    <>
+    {verify ? <OtpVerification mobile={phone} setToken={setToken} /> : <div className="flex justify-center min-h-screen pt-24 pb-42 bg-gray-100 px-4">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-md bg-white p-6 rounded-lg shadow-md"
@@ -66,7 +91,7 @@ const ForgotPasswordForm = () => {
           <input
             type={showNewPassword ? 'text' : 'password'}
             name="newPassword"
-            onChange={(e) => {setPassword(e.target.value)}} value={newPassword}
+            onChange={(e) => setPassword(e.target.value)} value={password}
             className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
@@ -83,13 +108,13 @@ const ForgotPasswordForm = () => {
 
           {/* Password Strength */}
           <div className="mb-4">
-            {newPassword && (
+            {password && (
               <p className={`text-sm font-medium ${strength.color}`}>
                 Strength: {strength.label}
               </p>
             )}
-            {errors.newPassword && (
-              <p className="text-red-500 text-sm mt-1">{errors.newPassword}</p>
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
             )}
           </div>
 
@@ -102,7 +127,9 @@ const ForgotPasswordForm = () => {
           Reset Password
         </button>
       </form>
-    </div>
+    </div>}
+    </>
+    
   );
 };
 

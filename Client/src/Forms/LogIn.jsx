@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid'; // Heroicons
-
+import { useLogInMutation } from '../RTK Query/UserApi';
+import { toast } from 'react-hot-toast';
 //   const HandleLogin = async (e) => {
 //     e.preventDefault();
 //     if (!phone || !password) {
@@ -29,6 +30,8 @@ const LoginForm = () => {
   const [errors, setErrors] = useState({});
   const [showPassword ,setShowPassword] = useState(false)
 
+  const [login, { data }] = useLogInMutation();
+  const navigate = useNavigate();
 
   const validate = () => {
     const newErrors = {};
@@ -37,15 +40,27 @@ const LoginForm = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setPhone()
     const validationErrors = validate();
     if (!phone || !password) {
       setErrors(validationErrors);
       return;
     }
 
-    console.log('Logging in with:', formData);
+    try {
+      let mob = '91' + phone;
+      await login({phone: mob ,password}).unwrap();
+      toast.success('Logged-in successfully!');
+      setPassword('');
+      setPhone('');
+      console.log(data);
+      navigate('/');
+    } catch (err) {
+      console.log(err);
+    }
+    
     // Handle actual login logic here
   };
 
